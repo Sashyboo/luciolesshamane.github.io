@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particules</title>
+    <style>
+        /* --- STYLES GÉNÉRAUX --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0f172a;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: #f1f5f9;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        canvas {
+            display: block;
+            cursor: crosshair;
+            touch-action: none;
+            will-change: transform;
+            transform: translateZ(0); 
+        }
+
+        /* --- BOUTON FLOTTANT --- */
+        #menu-toggle {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        #menu-toggle:hover {
+            background-color: rgba(30, 41, 59, 0.9);
+            transform: scale(1.05);
+        }
+
+        #menu-toggle svg { transition: transform 0.3s ease; }
+        .menu-open #menu-toggle {
+            background-color: #ef4444;
+            border-color: #ef4444;
+        }
+        .menu-open #menu-toggle svg { transform: rotate(45deg); }
+
+        /* --- PANNEAU PRINCIPAL --- */
+        #ui-panel {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            width: 300px;
+            max-height: calc(100vh - 2rem);
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0.95) translate(-20px, -20px);
+            transform-origin: top left;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        
+        #ui-panel::-webkit-scrollbar { display: none; }
+        .menu-open #ui-panel {
+            opacity: 1;
+            transform: scale(1) translate(0, 0);
+            pointer-events: auto;
+        }
+
+        .panel-content { margin-top: 2.5rem; }
+
+        @media (max-width: 600px) {
+            #ui-panel {
+                width: calc(100% - 3rem);
+                max-width: 350px;
+            }
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin: 0 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- SLIDERS --- */
+        .slider-group { margin-bottom: 1.5rem; }
+        
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            cursor: pointer;
+            height: 24px;
+            margin: 0;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            background: #334155;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            margin-top: -9px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        input[type=range]:active::-webkit-slider-thumb {
+            transform: scale(1.2);
+            background: #6366f1;
+            border-color: #fff;
+        }
+
+        /* --- AI & CONTROLES --- */
+        .ai-container {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: #1e293b;
+            border: 1px solid #475569;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus { border-color: #6366f1; }
+
+        .btn-magic {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 0 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            background-color: #1e293b;
+            padding: 0.3rem;
+            border-radius: 0.75rem;
+            gap: 0.3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        button.control-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #94a3b8;
+            background: transparent;
+            transition: all 0.2s;
+        }
+        
+        button.active-attract { background-color: #4f46e5 !important; color: white !important; }
+        button.active-repel { background-color: #db2777 !important; color: white !important; }
+
+        #ai-feedback {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            color: #a5b4fc;
+            min-height: 1.2em;
+            font-style: italic;
+            text-align: center;
+        }
+        
+        .loader {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div id="ui-wrapper">
+        <div id="menu-toggle" onclick="toggleMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+
+        <div id="ui-panel">
+            <div class="panel-content">
+                <h1><span style="font-size: 1.5rem;">✨</span> Particules</h1>
+                <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    Expérience interactive générative.
+                </p>
+
+                <div class="ai-container">
+                    <div style="font-size: 0.75rem; font-weight: 700; color: #c7d2fe; margin-bottom: 0.5rem; text-transform: uppercase;">
+                        AMUSE TOI MON COEUR, JE T'AIME
+                    </div>
+                    <div class="ai-input-group">
+                        <input type="text" id="prompt-input" placeholder="Ex: Galaxie calme..." onkeypress="handleEnter(event)">
+                        <button class="btn-magic" onclick="generateConfig()" id="btn-generate">GO</button>
+                    </div>
+                    <div id="ai-feedback"></div>
+                </div>
+
+                <div class="button-group">
+                    <button id="btn-attract" class="control-btn active-attract" onclick="setMode('attract')">Attirer</button>
+                    <button id="btn-repel" class="control-btn" onclick="setMode('repel')">Repousser</button>
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span>INTENSITÉ</span>
+                        <span id="count-display">150</span>
+                    </div>
+                    <input type="range" id="slider-count" min="50" max="3000" value="150" oninput="updateCount(this.value)">
+                </div>
+
+                <!-- NOUVEAU SLIDER RAYON -->
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span>RAYON D'ACTION</span>
+                        <span id="radius-display">400px</span>
+                    </div>
+                    <input type="range" id="slider-radius" min="10" max="800" value="400" oninput="updateRadius(this.value)">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span>VITESSE</span>
+                        <span id="speed-display">1.0x</span>
+                    </div>
+                    <input type="range" id="slider-speed" min="0.1" max="5.0" step="0.1" value="1.0" oninput="updateSpeed(this.value)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- LOGIQUE UI ---
+        function toggleMenu() {
+            const wrapper = document.getElementById('ui-wrapper');
+            wrapper.classList.toggle('menu-open');
+        }
+
+        // --- MOTEUR PARTICULES ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { alpha: false });
+        
+        let mode = 'attract';
+        let particleCount = 150;
+        let speedMultiplier = 1.0;
+        // NOUVEAU : Variable globale pour le rayon
+        let interactionRadius = 400; 
+        
+        let particles = [];
+        let mouse = { x: null, y: null };
+        let baseHue = 0;
+        let animationId;
+
+        const apiKey = "AIzaSyA0zfsvF0URuqk87izwf2TnBRylYBvHF2Y"; 
+
+        async function generateConfig() {
+            const promptInput = document.getElementById('prompt-input');
+            const btnGenerate = document.getElementById('btn-generate');
+            const feedback = document.getElementById('ai-feedback');
+            const userQuery = promptInput.value.trim();
+
+            if (!userQuery) return;
+
+            btnGenerate.disabled = true;
+            btnGenerate.innerHTML = '<span class="loader"></span>';
+            feedback.innerText = "Imaginons...";
+
+            const systemPrompt = `
+                Translate visual description into particle simulation parameters.
+                Adapt the colors and JSON dynamism to the prompt in the most accurate way possible.
+                Return ONLY JSON:
+                - hue: number (0-360).
+                - count: number (50-3000).
+                - speed: number (0.2 to 5.0).
+                - mode: "attract" or "repel".
+                - message: short French confirmation (max 3 words).
+            `;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: userQuery }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+
+                if (!response.ok) throw new Error("API Error");
+                const data = await response.json();
+                const config = JSON.parse(data.candidates[0].content.parts[0].text);
+
+                applyConfig(config);
+                feedback.innerText = `✨ ${config.message}`;
+
+            } catch (error) {
+                console.error(error);
+                feedback.innerText = "Erreur connexion.";
+            } finally {
+                btnGenerate.disabled = false;
+                btnGenerate.innerText = "GO";
+            }
+        }
+
+        function applyConfig(config) {
+            baseHue = config.hue;
+            particleCount = config.count;
+            speedMultiplier = config.speed;
+            setMode(config.mode);
+            document.getElementById('slider-count').value = config.count;
+            document.getElementById('count-display').innerText = config.count;
+            document.getElementById('slider-speed').value = config.speed;
+            document.getElementById('speed-display').innerText = config.speed + 'x';
+            initParticles();
+        }
+
+        function handleEnter(e) { if (e.key === 'Enter') generateConfig(); }
+
+        function setMode(newMode) {
+            mode = newMode;
+            document.getElementById('btn-attract').className = mode === 'attract' ? 'control-btn active-attract' : 'control-btn';
+            document.getElementById('btn-repel').className = mode === 'repel' ? 'control-btn active-repel' : 'control-btn';
+        }
+
+        function updateCount(val) {
+            particleCount = parseInt(val);
+            document.getElementById('count-display').innerText = val;
+            initParticles();
+        }
+
+        function updateSpeed(val) {
+            speedMultiplier = parseFloat(val);
+            document.getElementById('speed-display').innerText = val + 'x';
+        }
+
+        // NOUVEAU : Fonction de mise à jour du rayon
+        function updateRadius(val) {
+            interactionRadius = parseInt(val);
+            document.getElementById('radius-display').innerText = val + 'px';
+        }
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                mouse.x = e.touches[0].clientX;
+                mouse.y = e.touches[0].clientY;
+                e.preventDefault();
+            }
+        }, { passive: false });
+        const handleLeave = () => { mouse.x = null; mouse.y = null; };
+        window.addEventListener('touchend', handleLeave);
+        window.addEventListener('mouseout', handleLeave);
+
+        class Particle {
+            constructor() {
+                this.reset();
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1.5; 
+                this.baseVx = Math.random() * 3 - 1.5;
+                this.baseVy = Math.random() * 3 - 1.5;
+                this.vx = this.baseVx;
+                this.vy = this.baseVy;
+                this.colorHue = baseHue + (Math.random() * 40 - 20);
+                this.life = Math.random() * 100;
+                this.pulseSpeed = 0.02 + Math.random() * 0.05;
+            }
+
+            update() {
+                let currentVx = this.vx * speedMultiplier;
+                let currentVy = this.vy * speedMultiplier;
+                const margin = 20; 
+                const turnStrength = 0.15 * speedMultiplier;
+
+                // Répulsion douce des bords (Cela fonctionne bien)
+                if (this.x < margin) this.vx += turnStrength;
+                else if (this.x > canvas.width - margin) this.vx -= turnStrength;
+                
+                if (this.y < margin) this.vy += turnStrength;
+                else if (this.y > canvas.height - margin) this.vy -= turnStrength;
+
+                if (mouse.x != null) {
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const distSq = dx * dx + dy * dy;
+                    
+                    const maxDist = interactionRadius;
+                    const maxDistSq = maxDist * maxDist; 
+
+                    if (distSq < maxDistSq) {
+                        const distance = Math.sqrt(distSq);
+                        const force = (maxDist - distance) / maxDist;
+                        const basePower = mode === 'attract' ? 5 : -20; 
+                        const strength = force * basePower * speedMultiplier; 
+                        
+                        currentVx += (dx / distance) * strength;
+                        currentVy += (dy / distance) * strength;
+                    }
+                }
+
+                this.x += currentVx;
+                this.y += currentVy;
+
+                this.vx *= 0.98;
+                this.vy *= 0.98;
+                
+                // --- CORRECTIF MAJEUR ICI ---
+                // ANCIEN CODE (Supprimé) : Il forçait la particule à revenir à sa direction d'origine
+                // if (absVx < absBaseVx) this.vx += this.baseVx * 0.02;
+                
+                // NOUVEAU CODE : "Errance naturelle"
+                // On ajoute une toute petite force aléatoire à chaque image.
+                // Cela empêche la particule de s'arrêter, sans la forcer dans une direction précise.
+                // C'est beaucoup plus naturel pour des lucioles.
+                this.vx += (Math.random() - 0.5) * 0.1 * speedMultiplier;
+                this.vy += (Math.random() - 0.5) * 0.1 * speedMultiplier;
+
+                // Sécurité rebond (Hard bounce)
+                // Si malgré tout elle touche le bord, elle rebondit proprement
+                if (this.x < 0) { this.x = 0; this.vx *= -1; }
+                if (this.x > canvas.width) { this.x = canvas.width; this.vx *= -1; }
+                if (this.y < 0) { this.y = 0; this.vy *= -1; }
+                if (this.y > canvas.height) { this.y = canvas.height; this.vy *= -1; }
+
+                this.life += 1 * speedMultiplier;
+                const lightness = 60 + Math.sin(this.life * 0.05) * 20;
+                this.color = `hsl(${this.colorHue}, 85%, ${lightness}%)`;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+
+                const pulse = Math.sin(this.life * this.pulseSpeed);
+                const randomFlicker = Math.random() * 0.3;
+                ctx.globalAlpha = Math.max(0.4, 0.7 + (pulse * 0.2) + randomFlicker);
+                
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.25)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            animationId = requestAnimationFrame(animate);
+        }
+
+        initParticles();
+        animate();
+
+    </script>
+</body>
+</html>
