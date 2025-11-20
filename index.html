@@ -524,7 +524,8 @@
             }
         }
 
-        // --- FULLSCREEN ---        function toggleFullscreen() {
+// --- FULLSCREEN (COMPATIBILITÉ SAFARI/IOS) ---
+        function toggleFullscreen() {
             const btn = document.getElementById('btn-fullscreen');
             const doc = document;
             const docEl = document.documentElement;
