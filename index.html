@@ -358,9 +358,9 @@
                     </button>
                     <div class="select-wrapper">
                         <select id="music-style" onchange="changeMusicStyle()">
-                            <option value="feerique">Féerique (Carillon)</option>
-                            <option value="zen">Zen (Doux & Chaud)</option>
-                            <option value="espace">Espace (Mystérieux)</option>
+                            <option value="feerique">Féerique</option>
+                            <option value="zen">Zen</option>
+                            <option value="espace">Espace</option>
                         </select>
                         <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                     </div>
@@ -368,7 +368,7 @@
 
                 <div class="slider-group">
                     <div class="slider-header">
-                        <span>INTENSITÉ</span>
+                        <span>NOMBRE DE LUCIOLES</span>
                         <span id="count-display">150</span>
                     </div>
                     <input type="range" id="slider-count" min="50" max="3000" value="150" oninput="updateCount(this.value)">
@@ -376,7 +376,7 @@
 
                 <div class="slider-group">
                     <div class="slider-header">
-                        <span>RAYON D'ACTION</span>
+                        <span>RAYON</span>
                         <span id="radius-display">400px</span>
                     </div>
                     <input type="range" id="slider-radius" min="10" max="800" value="400" oninput="updateRadius(this.value)">
