@@ -258,7 +258,7 @@
 
         <div id="ui-panel">
             <div class="panel-content">
-                <h1><span style="font-size: 1.5rem;">✨</span> Lucioles Shamane</h1>
+                <h1><span style="font-size: 1.5rem;">✨</span>Lucioles Shamane</h1>
                 <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem;">
                     Expérience interactive avec IA - Par @sashyboo.
                 </p>
@@ -339,16 +339,10 @@
 
         // MODIFICATION : Tableau de clés API pour le fallback
         const apiKeys = [
-            "AIzaSyA0zfsvF0URuqk87izwf2TnBRylYBvHF2Y", // Clé principale
-            "AIzaSyAwVmVcwkgw-HL-aqoSnX_18O-f-NfYhvY", // Clé de secours 
-            "AIzaSyA7YfJPRLTo_L5-D9VOqb2xM6GpLEKDznk", // Clé de secours
-            "AIzaSyCWD7JeFK00-jBqwjpTP50KnIGfZejkEhA", // Clé de secours 
-            "AIzaSyAfFQSVE75E3mjVGcLN39J89TYthYBeBhM", // Clé de secours 
-            "AIzaSyBEFSSXUuGzZLyeLDEAscBbdEkOnkf4-4k", // Clé de secours 
-            "AIzaSyCExHtQ2w088m2-XrUVaFJ_56kXRpRvSCE", // Clé de secours 
-            "AIzaSyCE9F0vayvuZ86CEPvgr_6wVsvRE4axGt4", // Clé de secours 
-            "AIzaSyATxfaFX6l1VLdJ6ZLFJ8Cvih1SrITq_oI", // Clé de secours 
-            "AIzaSyBnSKOL3O1TNdIW_iWpf57alfmxi7k5VcA", // Clé de secours  
+            "AIzaSyBnSKOL3O1TNdIW_iWpf57alfmxi7k5VcA", // Clé principale
+            "AIzaSyATxfaFX6l1VLdJ6ZLFJ8Cvih1SrITq_oI",
+            "AIzaSyBEFSSXUuGzZLyeLDEAscBbdEkOnkf4-4k",
+            "AIzaSyAwVmVcwkgw-HL-aqoSnX_18O-f-NfYhvY" // Clé de secours 
         ];
 
         async function generateConfig() {
@@ -357,18 +351,17 @@
             const feedback = document.getElementById('ai-feedback');
             const userQuery = promptInput.value.trim();
 
-
             if (!userQuery) return;
 
             btnGenerate.disabled = true;
             btnGenerate.innerHTML = '<span class="loader"></span>';
             feedback.innerText = "Imaginons...";
 
-            // MODIFICATION : Prompt Système ajusté pour exiger plus de diversité de couleurs
+            // Prompt Système avec la demande de couleurs variées (préservé)
             const systemPrompt = `
                 Translate visual description into particle simulation parameters.
                 Adapt the colors and JSON dynamism to the prompt in the most accurate way possible.
-                CRITICAL: Use a VERY WIDE range of colors. Do not stick to blue/purple defaults. Explore Red, Orange, Green, Yellow, Pink, Cyan, White, Black.
+                CRITICAL: Use a VERY WIDE range of colors. Do not stick to blue/purple defaults. Explore Red, Orange, Green, Yellow, Pink, Cyan.
                 Return ONLY JSON:
                 - hue: number (0-360).
                 - count: number (50-3000).
@@ -377,31 +370,46 @@
                 - message: short French confirmation (max 3 words).
             `;
 
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: userQuery }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
-                        generationConfig: { responseMimeType: "application/json" }
-                    })
-                });
+            let success = false;
 
-                if (!response.ok) throw new Error("API Error");
-                const data = await response.json();
-                const config = JSON.parse(data.candidates[0].content.parts[0].text);
+            // MODIFICATION : Boucle sur les clés API pour gérer les échecs
+            for (const key of apiKeys) {
+                if (!key) continue; // Ignorer les clés vides
 
-                applyConfig(config);
-                feedback.innerText = `✨ ${config.message}`;
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: userQuery }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] },
+                            generationConfig: { responseMimeType: "application/json" }
+                        })
+                    });
 
-            } catch (error) {
-                console.error(error);
-                feedback.innerText = "Erreur connexion.";
-            } finally {
-                btnGenerate.disabled = false;
-                btnGenerate.innerText = "GO";
+                    if (!response.ok) throw new Error(`API Error ${response.status}`);
+                    
+                    const data = await response.json();
+                    const config = JSON.parse(data.candidates[0].content.parts[0].text);
+
+                    applyConfig(config);
+                    feedback.innerText = `✨ ${config.message}`;
+                    success = true;
+                    break; // Si ça marche, on sort de la boucle (pas besoin de tester la clé suivante)
+
+                } catch (error) {
+                    console.warn(`Echec avec la clé ${key.substring(0, 5)}...`, error);
+                    // On continue à la prochaine clé dans la liste
+                }
             }
+
+            if (!success) {
+                feedback.innerText = "Toutes les clés API ont échoué. Contacter @sashyboo";
+            }
+            
+            // Fin du chargement
+            btnGenerate.disabled = false;
+            btnGenerate.innerText = "GO";
         }
 
         function applyConfig(config) {
