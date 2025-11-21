@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Les Lucioles de la Plaine</title>
+    <title>Lucioles Shamane</title>
     <style>
         /* --- STYLES GÉNÉRAUX --- */
         body, html {
@@ -296,7 +296,7 @@
 
         <div id="ui-panel">
             <div class="panel-content">
-                <h1><span style="font-size: 1.5rem;">✨</span>Les Lucioles de la Plaine</h1>
+                <h1><span style="font-size: 1.5rem;">✨</span>Lucioles Shamane</h1>
                 
                 <!-- MESSAGE ALÉATOIRE -->
                 <p id="random-message" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; min-height: 1.2em;">
@@ -373,46 +373,46 @@
     </div>
 
     <script>
-        // --- LISTE ÉTENDUE DE 150 MESSAGES ---
+        
         const messages = [
-            // Simples et doux
-            "Détends-toi un peu", "Je t'aime !", "Respire profondément", "Profite de l'instant", "Tu es lumière",
-            "Laisse tes soucis s'envoler", "Regarde la magie opérer", "Un moment de douceur", "Calme et sérénité", "Tu es formidable",
-            "Prends soin de toi", "Écoute le silence", "Laisse-toi porter", "Rêve un peu", "La beauté est partout",
-            "Souris à la vie", "Ton sourire est précieux", "Paix intérieure", "Harmonie et douceur", "Observe et relâche",
-            "Le bonheur est ici", "Tu es capable de tout", "Crois en toi", "Fais un vœu", "Lumière dans l'obscurité",
-            "Douce nuit", "Instant magique", "Apaise ton esprit", "Force et courage", "Tu rayonnes",
-            "Simplicité", "Juste toi et l'univers", "Équilibre", "Sérénité absolue", "Ferme les yeux et imagine",
-            "La nature est belle", "Ton coeur est grand", "Lâche prise", "Tout ira bien", "Moment présent",
-            "Éclat de joie", "Danse avec les lucioles", "Respire la vie", "Tu es unique", "Amour et lumière",
+            
+            "Détends-toi un peu", "Je t'aime !", "Respire profondément", "Profite de l'instant", "T'es ma lumière",
+            "Laisse tes soucis s'envoler", "Regarde , c'est magique", "Un moment de douceur", "Calme, sérénité", "T'es formidable",
+            "Prends soin de toi", "Écoute le silence", "Laisse-toi porter", "Rêve un peu", "Je t'ai déjà dit que t'étais magnifique ?",
+            "Souris !", "Ton sourire, c'est le plus beau. JTE JURE SOURIS PLUS", "Un petit havre de paix", "Un peu de douceur", "Observe et relâche",
+            "Le bonheur est ici", "T'es capable de tout", "Crois en toi", "Fais un vœu", "Un peu de lumière dans l'obscurité",
+            "Douce nuit", "Instant magique", "Apaise ton esprit", "Force et courage", "Tu rayonnes, j'ai mal aux yeux",
+            "Simplicité", "Juste toi et l'univers", "Équilibre, c'est le secret", "Sérénité absolue ! Mets un peu de musique", "Ferme les yeux et imagine",
+            "La nature est belle, lâche un peu tiktok", "Ton coeur est grand.. Mais le mien +", "Lâche prise", "Tout ira bien", "Moment présent",
+            "Éclat de joie", "Danse avec les lucioles", "Respire la vie", "T'es unique", "Amour et lumière",
             "Sois toi-même", "La vie t'aime", "Gratitude", "Douceur de vivre", "Rien que du bonheur",
             
-            // Amour et Affection
-            "Mon cœur bat pour toi", "Tu es ma plus belle aventure", "Chaque jour avec toi est un cadeau", "Mon amour pour toi est infini",
-            "Tu illumines ma vie", "Avec toi, tout est plus beau", "Tu es mon rayon de soleil", "Mon bonheur, c'est toi",
-            "Tu es mon étoile", "Je pense à toi", "Tu es ma maison", "Mon âme soeur", "Ton rire est ma mélodie préférée",
-            "Tu es magnifique", "J'aime tout de toi", "Tu me rends meilleur", "Mon amour", "Tu es mon essentiel",
-            "Juste toi et moi", "Pour toujours", "Tu es mon ancre", "Tu es ma force", "Je t'adore", "Tu es précieuse",
-            "Tu es mon monde", "Mon trésor", "Ma moitié", "Je suis là pour toi", "Tu es ma joie", "Mon inspiration",
+            
+            "Mon cœur bat pour toi", "T'es ma plus belle aventure", "Chaque jour avec toi est un cadeau - Winnie", "Mon amour pour toi est infini, vraiment.",
+            "T'illumines ma vie", "Avec toi, tout est plus beau", "T'es mon rayon de soleil", "Mon bonheur, c'est toi",
+            "T'es mon étoile", "Je pense à toi", "T'es ma maison", "Mon âme soeur", "Ton rire est mon son préféré",
+            "T'es magnifique", "J'aime tout de toi", "Tu me rends meilleur", "Mon amour", "T'es mon essentiel (j'ai plus d'inspi mais faut du nouveau) JE T'AIME",
+            "Juste toi et moi", "Pour toujours", "T'es mon ancre, tié un lion wallah", "T'es ma force", "Je t'adore", "T'es précieuse",
+            "T'es mon monde", "Mon trésor", "Ma moitié", "Je suis là pour toi", "T'es ma joie", "Mon inspiration",
 
-            // Motivation et Courage
-            "N'abandonne jamais", "Tu es plus fort que tu ne le crois", "Chaque pas compte", "Le meilleur est à venir",
+            
+            "N'abandonne jamais", "T'es plus fort que tu ne le crois", "Chaque pas compte", "Le meilleur est à venir",
             "Ose rêver grand", "La réussite t'attend", "Crois en tes rêves", "Tu as du potentiel", "Rien n'est impossible",
             "Fonce !", "Sois audacieux", "Transforme tes rêves en réalité", "Le courage est en toi", "Persévère",
             "Tu vas y arriver", "Garde espoir", "Sois fier de toi", "Chaque jour est une chance", "Vis tes rêves",
-            "Tu as le pouvoir", "Brille de mille feux", "Dépasse-toi", "Le succès est un voyage", "Fais de ton mieux",
-            "Rien ne t'arrête", "Tu es une force de la nature", "Vise la lune", "Sois le changement", "Avance avec confiance",
+            "Que la force soit avec toi, je ne suis pas ton père.", "Brille de mille feux", "Dépasse-toi", "Le succès est un voyage", "Fais de ton mieux",
+            "Rien ne t'arrête", "T'es une force de la nature", "Vise la lune", "Sois le changement", "Avance avec confiance",
             
-            // Citations et Sagesse
-            "La vie est un mystère à vivre", "Le bonheur se crée", "Écoute ton intuition", "La patience est une vertu",
+            
+            "Laisse toi porter par la vie. Tout va bien.", "Le bonheur se crée", "Écoute ton intuition", "La patience est une vertu",
             "Sois le capitaine de ton âme", "L'amour est la réponse", "La gentillesse est une force", "Vis l'instant présent",
             "La gratitude transforme tout", "Le calme est une super-puissance", "La simplicité est la clé", "Tout est énergie",
             "L'univers conspire pour toi", "La paix commence par un sourire", "Sois la lumière", "L'espoir fait vivre",
             "La vie est belle", "Chaque fin est un début", "L'essentiel est invisible", "Écoute ton cœur",
             "La nature ne se presse pas", "Tout vient à point", "L'amour déplace les montagnes", "Sois doux avec toi-même",
             "La joie est un choix", "Respire et souris", "L'harmonie est en toi", "La vie est un cadeau",
-            "Tu es une merveille", "Le monde a besoin de toi", "Crée ta propre magie", "L'amour est partout",
-            "Ouvre ton coeur", "Laisse entrer la lumière", "Tu es aimé", "Sois curieux", "Explore le monde",
+            "T'es une merveille", "Le monde a besoin de toi", "Crée ta propre magie", "L'amour est partout",
+            "Ouvre ton coeur", "Laisse entrer la lumière", "T'es aimé", "Sois curieuse", "Explore le monde",
             "La vie est une danse", "Chante ta chanson", "Sois libre"
         ];
 
