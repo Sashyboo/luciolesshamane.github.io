@@ -27,10 +27,10 @@
             transform: translateZ(0); 
         }
 
-        /* --- BOUTON FLOTTANT --- */
+        /* --- BOUTON FLOTTANT (MODIFIÉ: EN BAS À GAUCHE) --- */
         #menu-toggle {
             position: absolute;
-            top: 1rem;
+            bottom: 1rem; /* Changé de top à bottom */
             left: 1rem;
             width: 48px;
             height: 48px;
@@ -61,13 +61,13 @@
         }
         .menu-open #menu-toggle svg { transform: rotate(45deg); }
 
-        /* --- PANNEAU PRINCIPAL --- */
+        /* --- PANNEAU PRINCIPAL (MODIFIÉ: ANCRÉ EN BAS) --- */
         #ui-panel {
             position: absolute;
-            top: 1rem;
+            bottom: 5rem; /* Positionné juste au-dessus du bouton */
             left: 1rem;
             width: 300px;
-            max-height: calc(100vh - 2rem);
+            max-height: calc(100vh - 6rem); /* Ajusté pour ne pas dépasser l'écran */
             background-color: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -77,8 +77,9 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             z-index: 10;
             opacity: 0;
-            transform: scale(0.95) translate(-20px, -20px);
-            transform-origin: top left;
+            /* Animation part du bas vers la gauche */
+            transform: scale(0.95) translate(-20px, 20px); 
+            transform-origin: bottom left; 
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             pointer-events: none;
             overflow-y: auto;
@@ -92,7 +93,7 @@
             pointer-events: auto;
         }
 
-        .panel-content { margin-top: 2.5rem; }
+        .panel-content { margin-top: 0.5rem; /* Réduit car plus besoin d'espace pour le bouton en haut */ }
 
         @media (max-width: 600px) {
             #ui-panel {
